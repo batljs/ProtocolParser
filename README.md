@@ -1,5 +1,5 @@
 # ProtocolParser
-A self-defined protocal parser based on arduino
+A self-defined protocal parser based on Arduino
 
 # Arduino通信协议设计-V1.0
 

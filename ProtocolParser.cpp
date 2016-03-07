@@ -1,18 +1,18 @@
 /*
-ProtocolParserÀàµÄ¸÷¸öº¯ÊıµÄÊµÏÖ
+ProtocolParserç±»çš„å„ä¸ªå‡½æ•°çš„å®ç°
 */
 #include "ProtocolParser.h"
 #include <iostream>
 
 using namespace std;
 
-//»ñÈ¡Ğ­ÒéÊ×²¿Ö¸¶¨Ë÷ÒıµÄ×Ö·û,ÕâÀïÄ¬ÈÏÊ×²¿ÎªÒ»¸ö×Ö½Ú£¬±ÈÈçËµÎª0xAA
+//è·å–åè®®é¦–éƒ¨æŒ‡å®šç´¢å¼•çš„å­—ç¬¦,è¿™é‡Œé»˜è®¤é¦–éƒ¨ä¸ºä¸€ä¸ªå­—èŠ‚ï¼Œæ¯”å¦‚è¯´ä¸º0xAA
 char ProtocolParser::GetHeader()
 {
 	//int headerLength = strlen(m_cHeader);
 	return m_cHeader;
 }
-//»ñÈ¡¡°¿ØÖÆÖ¸Áî¡±×Ö¶ÎµÄ³¤¶È£¬Ïàµ±ÓÚ´ÓÒ»¸ö×Ö½Ú×ª»»³Éint
+//è·å–â€œæ§åˆ¶æŒ‡ä»¤â€å­—æ®µçš„é•¿åº¦ï¼Œç›¸å½“äºä»ä¸€ä¸ªå­—èŠ‚è½¬æ¢æˆint
 size_t ProtocolParser::GetCmdLength()
 {
 	int len = strlen(buffer);
@@ -23,28 +23,28 @@ size_t ProtocolParser::GetCmdLength()
 	}
 	return m_nCmdLength;
 }
-//»ñÈ¡Êµ¼Ê½ÓÊÕµ½µÄĞ£ÑéºÍ
+//è·å–å®é™…æ¥æ”¶åˆ°çš„æ ¡éªŒå’Œ
 size_t ProtocolParser::GetCheckSum()
 {
 	//int len = strlen(buffer);
 	m_nRecvCheckSum = buffer[GetCmdLength() + 1] & 0xff;
 	return m_nRecvCheckSum;
 }
-//´ÓbufferÖĞ½âÎö³öÉè±¸ÀàĞÍ
+//ä»bufferä¸­è§£æå‡ºè®¾å¤‡ç±»å‹
 size_t ProtocolParser::GetDeviceType()
 {
 	//int len = strlen(buffer);
 	//return (buffer[2] - '0') * 16 + (buffer[3] - '0') * 1;
 	return buffer[1] & 0xff;
 }
-//´ÓbufferÖĞ½âÎö³öÉè±¸ºÅ
+//ä»bufferä¸­è§£æå‡ºè®¾å¤‡å·
 size_t ProtocolParser::GetDeviceNumber()
 {
 	//int len = strlen(buffer);
 	//return (buffer[4] - '0') * 16 + (buffer[5] - '0') * 1;
 	return buffer[2] & 0xff;
 }
-//´ÓbufferÖĞ½âÎö³ö¶Ë¿ÚºÅ
+//ä»bufferä¸­è§£æå‡ºç«¯å£å·
 size_t ProtocolParser::GetPort()
 {
 	//int len = strlen(buffer);
@@ -52,35 +52,35 @@ size_t ProtocolParser::GetPort()
 	return buffer[3] & 0xff;
 }
 
-//½«´Ó´®¿Ú½ÓÊÕµÄ×Ö·û´®´æÈëbufferÖĞ
+//å°†ä»ä¸²å£æ¥æ”¶çš„å­—ç¬¦ä¸²å­˜å…¥bufferä¸­
 void ProtocolParser::AppendChar(char ch)
 {
 	size_t bufferLength = strlen(buffer);
-	if (m_nRecvDataIndex==0&&ch==GetHeader())//½ÓÊÕµ½µÄÊı¾İµÄË÷ÒıÖµÎª1±íÊ¾ÊÇÊ×²¿
+	if (m_nRecvDataIndex==0&&ch==GetHeader())//æ¥æ”¶åˆ°çš„æ•°æ®çš„ç´¢å¼•å€¼ä¸º1è¡¨ç¤ºæ˜¯é¦–éƒ¨
 	{
 		m_bInCmd = true;
 		buffer[0] = 0;
 		m_nRecvDataIndex++;
 		return;
 	}
-	if ((m_nRecvDataIndex == (GetCmdLength()+2))&&m_nCmdLength)//´ïµ½ÁËË÷ÒıÖµ
+	if ((m_nRecvDataIndex == (GetCmdLength()+2))&&m_nCmdLength)//è¾¾åˆ°äº†ç´¢å¼•å€¼
 	{
 		buffer[bufferLength] = ch;
 		buffer[bufferLength + 1] = '\0';
 		size_t chksum = 0;
-		//¸ù¾İ½ÓÊÕµÄÊı¾İ¼ÆËãµÃ³öĞ£ÑéºÍ
+		//æ ¹æ®æ¥æ”¶çš„æ•°æ®è®¡ç®—å¾—å‡ºæ ¡éªŒå’Œ
 		for (size_t i = 0; i < GetCmdLength(); ++i)
 		{
 			chksum ^= buffer[i + 1];
 		}
-		if (chksum == GetCheckSum())//ÅĞ¶ÏÊµ¼Ê½ÓÊÕµ½µÄĞ£ÑéºÍ¸ú¼ÆËã³öÀ´µÄĞ£ÑéºÍÊÇ·ñÏàµÈ
+		if (chksum == GetCheckSum())//åˆ¤æ–­å®é™…æ¥æ”¶åˆ°çš„æ ¡éªŒå’Œè·Ÿè®¡ç®—å‡ºæ¥çš„æ ¡éªŒå’Œæ˜¯å¦ç›¸ç­‰
 		{
-			//½âÎöbufferµÄ¸÷¸ö×Ö¶ÎµÄº¬Òå
+			//è§£æbufferçš„å„ä¸ªå­—æ®µçš„å«ä¹‰
 			cout << "DeviceType:" << GetDeviceType() << endl;
 			cout << "DeviceNumber:" << GetDeviceNumber() << endl;
 			cout << "Port:" << GetPort() << endl;
 		}
-		else//²»ÏàµÈËµÃ÷³ö´íÁË
+		else//ä¸ç›¸ç­‰è¯´æ˜å‡ºé”™äº†
 		{
 			cout << "Error" << endl;
 		}
@@ -89,7 +89,7 @@ void ProtocolParser::AppendChar(char ch)
 		m_nRecvDataIndex = 0;
 		m_nRecvCheckSum = 0;
 	}
-	else if (m_bInCmd)//Ö¸ÁîÎ´½ÓÊÕÍê±Ï
+	else if (m_bInCmd)//æŒ‡ä»¤æœªæ¥æ”¶å®Œæ¯•
 	{
 		buffer[bufferLength] = ch;
 		buffer[bufferLength + 1] = '\0';
@@ -104,7 +104,7 @@ void ProtocolParser::Append(char *data)
 	}
 }
 
-int main()
+/*int main()
 {
 
 	freopen("in.txt", "r", stdin);
@@ -116,5 +116,5 @@ int main()
 		protocolParser.AppendChar(ch);
 	}
 	return 0;
-}
+}*/
 
